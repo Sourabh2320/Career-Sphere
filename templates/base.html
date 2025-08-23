@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerSphere</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #343a40 !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            font-weight: 700;
+        }
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1549923746-c5040a454d6a?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 10rem 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            animation: fadeIn 1s ease-in-out;
+        }
+        .hero-section h1 {
+            font-weight: 700;
+            font-size: 3.5rem;
+            letter-spacing: 1px;
+        }
+        .hero-section p {
+            font-size: 1.25rem;
+            font-weight: 300;
+        }
+        .btn-outline-light:hover {
+            background-color: white;
+            color: #343a40 !important;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        /* Footer Styles */
+        footer {
+            background-color: #343a40;
+            color: white;
+            padding: 2rem 0;
+            margin-top: 5rem;
+        }
+        footer a {
+            color: #adb5bd;
+            text-decoration: none;
+        }
+        footer a:hover {
+            color: white;
+        }
+        .social-icons a {
+            font-size: 1.5rem;
+        }
+        .logo-icon {
+            font-size: 1.5rem;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-graph-up-arrow logo-icon"></i>
+                CareerSphere
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user %}
+                    <li class="nav-item">
+                        <span class="nav-link text-white me-2">Hello, {{ user.username }}</span>
+                    </li>
+                    <li class="nav-item">
+                        {% if user.is_employer %}
+                        <a class="nav-link btn btn-outline-info text-white mx-2" href="{{ url_for('post_job') }}">Post a Job</a>
+                        <a class="nav-link btn btn-outline-light mx-2" href="{{ url_for('my_jobs') }}">My Posted Jobs</a>
+                        {% else %}
+                        <a class="nav-link btn btn-outline-light mx-2" href="{{ url_for('my_jobs') }}">My Applications</a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-danger text-white mx-2" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-outline-light mx-2" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-success text-white mx-2" href="{{ url_for('register') }}">Register</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% if request.path == '/' %}
+    <header class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-3">Find Your Dream Job</h1>
+            <p class="lead">Connect with top companies and explore thousands of opportunities.</p>
+        </div>
+    </header>
+    {% endif %}
+
+    <div class="container my-5 flex-grow-1">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="text-center text-lg-start mt-auto">
+      <div class="container p-4">
+        <div class="row">
+          <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+            <h5 class="text-uppercase">CareerSphere</h5>
+            <p>
+              Your one-stop destination for job seekers and employers. Find the right talent or the perfect job for you, quickly and easily.
+            </p>
+          </div>
+          <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+            <h5 class="text-uppercase">Links</h5>
+            <ul class="list-unstyled mb-0">
+              <li>
+                <a href="{{ url_for('home') }}" class="text-white">Home</a>
+              </li>
+              <li>
+                <a href="{{ url_for('login') }}" class="text-white">Login</a>
+              </li>
+              <li>
+                <a href="{{ url_for('register') }}" class="text-white">Register</a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+            <h5 class="text-uppercase">Connect With Me</h5>
+            <ul class="list-unstyled social-icons d-flex justify-content-center justify-content-lg-start mb-0">
+              <li>
+                <a href="https://www.linkedin.com/in/sourabh-kumar-764808165?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BTR4%2FN%2BkZTGKwWwYk3d1lpg%3D%3D" target="_blank" class="text-white me-3"><i class="bi bi-linkedin"></i></a>
+              </li>
+              <li>
+                <a href="https://github.com/Sourabh2320" target="_blank" class="text-white me-3"><i class="bi bi-github"></i></a>
+              </li>
+              <li>
+                <a href="mailto:sourabh20kumar2004@gmail.com" class="text-white me-3"><i class="bi bi-envelope"></i></a>
+              </li>
+              <li>
+                <a href="tel:+919654312970" class="text-white me-3"><i class="bi bi-telephone"></i></a>
+              </li>
+              <li>
+                <a href="https://www.instagram.com/unlike.sourabh" target="_blank" class="text-white me-3"><i class="bi bi-instagram"></i></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+        © 2025 Copyright:
+        <a class="text-white" href="https://github.com/Sourabh2320"> Made with ❤️ by Sourabh</a>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

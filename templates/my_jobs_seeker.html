@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <style>
+        .application-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+        }
+        .application-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .status-badge {
+            font-size: 0.9rem;
+            padding: 0.5em 0.8em;
+            font-weight: 600;
+        }
+        .details-alert {
+            border-left: 4px solid #0d6efd;
+        }
+    </style>
+
+    <div class="container my-5">
+        <h1 class="mb-4 text-center">My Applications on CareerSphere</h1>
+        <p class="lead text-center text-muted">Review the status of the jobs you have applied for.</p>
+        <hr class="mb-5">
+
+        {% if applications %}
+            <div class="row row-cols-1 g-4">
+                {% for application in applications %}
+                <div class="col">
+                    <div class="card application-card shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="card-title text-primary">{{ application.job.title }}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">{{ application.job.company }}</h6>
+                                </div>
+                                <span class="ms-auto">
+                                    {% if application.status == 'accepted' %}
+                                        <span class="badge bg-success status-badge">Accepted</span>
+                                    {% elif application.status == 'rejected' %}
+                                        <span class="badge bg-danger status-badge">Rejected</span>
+                                    {% elif application.status == 'hired' %}
+                                        <span class="badge bg-primary status-badge">Hired! 🎉</span>
+                                    {% elif application.status == 'canceled' %}
+                                        <span class="badge bg-warning text-dark status-badge">Application Canceled</span>
+                                    {% else %}
+                                        <span class="badge bg-info text-dark status-badge">Pending</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <p class="card-text mt-3">{{ application.job.description | truncate(200) }}</p>
+                            
+                            <ul class="list-unstyled d-flex flex-wrap small text-muted">
+                                <li class="me-3"><i class="bi bi-cash-stack"></i> Salary: {{ application.job.salary }}</li>
+                                <li class="me-3"><i class="bi bi-geo-alt-fill"></i> Location: {{ application.job.location }}</li>
+                                <li class="me-3"><i class="bi bi-briefcase-fill"></i> Category: {{ application.job.category }}</li>
+                            </ul>
+                            
+                            <hr>
+                            
+                            {% if application.status == 'accepted' and not application.details %}
+                                <div class="alert alert-success d-flex align-items-center mt-3 p-3" role="alert">
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    <div>
+                                        Congratulations! Your application has been accepted. Please submit your details to proceed.
+                                    </div>
+                                    <a href="{{ url_for('submit_details', application_id=application.id) }}" class="btn btn-primary btn-sm ms-auto">Submit Details</a>
+                                </div>
+                            {% elif application.details %}
+                                <div class="alert alert-primary d-flex align-items-center mt-3 p-3 details-alert" role="alert">
+                                    <i class="bi bi-check-circle-fill me-2"></i>
+                                    <div>
+                                        You have successfully submitted your details. The employer is now reviewing your information.
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center mt-5">
+                <p class="mb-0">You have not applied for any jobs yet.</p>
+                <a href="{{ url_for('home') }}" class="btn btn-primary mt-3">Browse available jobs</a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <style>
+        .applicant-details-card {
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            border-radius: 0.25rem;
+            margin-top: 1rem;
+        }
+        .status-badge {
+            font-size: 0.9rem;
+            padding: 0.5em 0.8em;
+            font-weight: 600;
+        }
+        .applicant-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-hire, .btn-accept {
+            margin-right: 0.5rem;
+        }
+    </style>
+
+    <div class="container my-5">
+        <h1 class="mb-4 text-center">My Listings on CareerSphere</h1>
+        <p class="lead text-center text-muted">Manage the jobs you've posted and review applications from job seekers.</p>
+        <hr class="mb-5">
+
+        {% if jobs_with_applicants %}
+            <div class="row row-cols-1 g-4">
+                {% for item in jobs_with_applicants %}
+                <div class="col">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">{{ item.job.title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ item.job.company }}</h6>
+                            <p class="card-text">{{ item.job.description | truncate(200) }}</p>
+                            <ul class="list-unstyled d-flex flex-wrap small text-muted">
+                                <li class="me-3"><i class="bi bi-cash-stack"></i> {{ item.job.salary }}</li>
+                                <li class="me-3"><i class="bi bi-geo-alt-fill"></i> {{ item.job.location }}</li>
+                                <li class="me-3"><i class="bi bi-briefcase-fill"></i> {{ item.job.category }}</li>
+                                <li class="me-3"><i class="bi bi-calendar-check-fill"></i> Posted on: {{ item.job.date_posted.strftime('%Y-%m-%d') }}</li>
+                            </ul>
+                            
+                            <hr>
+                            
+                            <p class="card-text"><strong>Total Applicants: <span class="text-primary">{{ item.applicant_count }}</span></strong></p>
+                            
+                            <div class="d-flex justify-content-end mb-3">
+                                <form action="{{ url_for('delete_job', job_id=item.job.id) }}" method="POST">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this job post? This action cannot be undone.');">
+                                        Delete Post
+                                    </button>
+                                </form>
+                            </div>
+                            {% if item.applicants %}
+                                <div class="accordion mt-4" id="accordionApplicants-{{ item.job.id }}">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="heading-{{ item.job.id }}">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ item.job.id }}" aria-expanded="false" aria-controls="collapse-{{ item.job.id }}">
+                                                View Applicants
+                                            </button>
+                                        </h2>
+                                        <div id="collapse-{{ item.job.id }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ item.job.id }}" data-bs-parent="#accordionApplicants-{{ item.job.id }}">
+                                            <div class="accordion-body p-0">
+                                                <ul class="list-group list-group-flush">
+                                                    {% for applicant in item.applicants %}
+                                                        <li class="list-group-item applicant-list-item">
+                                                            <div>
+                                                                <i class="bi bi-person-fill me-2"></i><strong>{{ applicant.username }}</strong>
+                                                                <small class="text-muted ms-2">(Applied on: {{ applicant.date_applied.strftime('%Y-%m-%d') }})</small>
+                                                            </div>
+                                                            <div class="d-flex align-items-center">
+                                                                {% if applicant.status == 'pending' %}
+                                                                    <div class="btn-group" role="group">
+                                                                        <a href="{{ url_for('accept_application', application_id=applicant.application_id) }}" class="btn btn-success btn-sm">Accept</a>
+                                                                        <a href="{{ url_for('reject_application', application_id=applicant.application_id) }}" class="btn btn-danger btn-sm">Reject</a>
+                                                                    </div>
+                                                                {% elif applicant.status == 'accepted' %}
+                                                                    <span class="badge bg-success status-badge me-2">Accepted</span>
+                                                                    {% if applicant.details %}
+                                                                        <div class="btn-group" role="group">
+                                                                            <a href="{{ url_for('hire_applicant', application_id=applicant.application_id) }}" class="btn btn-primary btn-sm">Hire</a>
+                                                                            <a href="{{ url_for('cancel_hire', application_id=applicant.application_id) }}" class="btn btn-danger btn-sm ms-1">Cancel</a>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                {% elif applicant.status == 'hired' %}
+                                                                    <span class="badge bg-primary status-badge">Hired</span>
+                                                                {% elif applicant.status == 'canceled' %}
+                                                                    <span class="badge bg-warning text-dark status-badge">Canceled</span>
+                                                                {% else %}
+                                                                    <span class="badge bg-danger status-badge">Rejected</span>
+                                                                {% endif %}
+                                                            </div>
+                                                        </li>
+                                                        {% if applicant.details %}
+                                                            <div class="p-3 applicant-details-card">
+                                                                <strong>Applicant Details:</strong><br>
+                                                                <ul class="list-unstyled mb-0 mt-2 small">
+                                                                    <li><strong>Name:</strong> {{ applicant.details.full_name }}</li>
+                                                                    <li><strong>Email:</strong> {{ applicant.details.email }}</li>
+                                                                    <li><strong>Phone:</strong> {{ applicant.details.phone_number }}</li>
+                                                                    <li><strong>Address:</strong> {{ applicant.details.address }}</li>
+                                                                    <li><strong>Qualification:</strong> {{ applicant.details.qualification }}</li>
+                                                                    <li><strong>Experience:</strong> {{ applicant.details.experience }}</li>
+                                                                    <li><strong>CGPA/Percentage:</strong> {{ applicant.details.percentage_cgpa }}</li>
+                                                                    <li><strong>Skills:</strong> {{ applicant.details.skills }}</li>
+                                                                    <li><strong>Hobbies:</strong> {{ applicant.details.hobbies }}</li>
+                                                                </ul>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="mt-4">
+                                    <p class="text-muted">No one has applied for this job yet.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center mt-5">
+                <p class="mb-0">You haven't posted any jobs yet.</p>
+                <a href="{{ url_for('post_job') }}" class="btn btn-primary mt-3">Post a new job now!</a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

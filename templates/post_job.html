@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <style>
+        .form-card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .form-header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 2rem;
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+            text-align: center;
+        }
+        .form-header h2 {
+            font-weight: 700;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+            <div class="card form-card">
+                <div class="form-header">
+                    <h2>Post a New Listing</h2>
+                    <p class="lead">Fill out the form below to post a new job on CareerSphere.</p>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ url_for('post_job') }}" method="post">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="title" class="form-label">Job Title</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="company" class="form-label">Company Name</label>
+                                <input type="text" class="form-control" id="company" name="company" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="salary" class="form-label">Salary</label>
+                                <input type="text" class="form-control" id="salary" name="salary" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="job_type" class="form-label">Job Type</label>
+                                <select class="form-select" id="job_type" name="job_type" required>
+                                    <option value="" selected disabled>Select an option</option>
+                                    <option value="Full-Time">Full-Time</option>
+                                    <option value="Part-Time">Part-Time</option>
+                                    <option value="Internship">Internship</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="country" class="form-label">Country</label>
+                                <select class="form-select" id="country" name="country" required>
+                                    <option value="" selected disabled>Select Country</option>
+                                    <option value="India">India</option>
+                                    <option value="USA">USA</option>
+                                    <option value="UK">UK</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="state" class="form-label">State</label>
+                                <select class="form-select" id="state" name="state" required>
+                                    <option value="" selected disabled>Select State</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="category" class="form-label">Category</label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="" selected disabled>Select a category</option>
+                                    <option value="IT">IT</option>
+                                    <option value="Service">Service</option>
+                                    <option value="Management">Management</option>
+                                    <option value="Finance">Finance</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mt-4">Post Job</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const countries = {
+            "India": ["Delhi", "Mumbai", "Bangalore", "Punjab", "Haryana", "Uttar Pradesh"],
+            "USA": ["New York", "California", "Texas", "Florida", "Illinois"],
+            "UK": ["London", "Manchester", "Birmingham", "Liverpool", "Glasgow"]
+        };
+        const countrySelect = document.getElementById('country');
+        const stateSelect = document.getElementById('state');
+
+        countrySelect.addEventListener('change', (e) => {
+            const selectedCountry = e.target.value;
+            const states = countries[selectedCountry] || [];
+            stateSelect.innerHTML = '<option value="" selected disabled>Select State</option>';
+            states.forEach(state => {
+                const option = document.createElement('option');
+                option.value = state;
+                option.textContent = state;
+                stateSelect.appendChild(option);
+            });
+        });
+    </script>
+{% endblock %}
