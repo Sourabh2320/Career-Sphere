@@ -53,7 +53,7 @@ Clone the repository:
 
 Bash
 
-git clone https://github.com/Sourabh2320/CareerSphere.git
+git clone https://github.com/Sourabh2320/Career-Sphere.git
 cd CareerSphere
 Set up a virtual environment:
 
