@@ -141,19 +141,12 @@
               Your one-stop destination for job seekers and employers. Find the right talent or the perfect job for you, quickly and easily.
             </p>
           </div>
+          
           <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
-            <h5 class="text-uppercase">Links</h5>
-            <ul class="list-unstyled mb-0">
-              <li>
-                <a href="{{ url_for('home') }}" class="text-white">Home</a>
-              </li>
-              <li>
-                <a href="{{ url_for('login') }}" class="text-white">Login</a>
-              </li>
-              <li>
-                <a href="{{ url_for('register') }}" class="text-white">Register</a>
-              </li>
-            </ul>
+            <h5 class="text-uppercase">People Trusting Us</h5>
+            <p class="h1 fw-bold text-primary">
+              <span id="user-count" data-count="{{ user_count }}">0</span>
+            </p>
           </div>
           <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
             <h5 class="text-uppercase">Connect With Me</h5>
@@ -184,5 +177,27 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-</body>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const counterElement = document.getElementById('user-count');
+        const target = parseInt(counterElement.getAttribute('data-count'), 10);
+        let current = 0;
+        const duration = 2000; // 2 seconds
+        const increment = target / duration * 10;
+
+        const updateCounter = () => {
+          current += increment;
+          if (current < target) {
+            counterElement.innerText = Math.ceil(current);
+            requestAnimationFrame(updateCounter);
+          } else {
+            counterElement.innerText = target;
+          }
+        };
+
+        updateCounter();
+      });
+    </script>
+    </body>
 </html>

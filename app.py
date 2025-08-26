@@ -72,6 +72,19 @@ def get_current_user():
         return User.query.get(user_id)
     return None
 
+# --- NEW: Context Processor for User Count ---
+@app.context_processor
+def inject_user_count():
+    """Injects the total number of users into the context of all templates."""
+    with app.app_context():
+        try:
+            user_count = db.session.query(User).count()
+        except Exception:
+            # Fallback in case the database is not ready
+            user_count = 0
+        return dict(user_count=user_count)
+# --- END NEW CODE ---
+
 @app.route('/')
 def home():
     user = get_current_user()
